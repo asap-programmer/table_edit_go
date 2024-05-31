@@ -15,7 +15,7 @@ import (
 )
 
 func main() {
-    db, err := sql.Open("mysql", "root:qwerty123)@/test")
+    db, err := sql.Open("mysql", "root:qwerty123)@/bank")
 
     if err != nil {
 		fmt.Println("error")
@@ -33,7 +33,7 @@ func main() {
         val1 := r.FormValue("col1")
         val2 := r.FormValue("col2")
         val3 := r.FormValue("col3")
-		sQuery := "INSERT INTO myarttable (text, description, keywords) VALUES ('"+val1+"', '"+val2+"', '"+val3+"')"
+		sQuery := "INSERT INTO individuals (text, description, keywords) VALUES ('"+val1+"', '"+val2+"', '"+val3+"')"
 
 		fmt.Println(sQuery)
 
@@ -58,7 +58,7 @@ func main() {
 		val1 := r.FormValue("col1")
 		val2 := r.FormValue("col2")
 		val3 := r.FormValue("col3")
-		sQuery := "UPDATE myarttable SET text = '" + val1 + "', description = '" + val2 + "', keywords = '" + val3 + "' WHERE id = " + id
+		sQuery := "UPDATE individuals SET text = '" + val1 + "', description = '" + val2 + "', keywords = '" + val3 + "' WHERE id = " + id
 
 		fmt.Println(sQuery)
 
@@ -90,8 +90,8 @@ func viewSelect(w http.ResponseWriter, db *sql.DB) {
 			fmt.Fprintf(w, scanner.Text())
 		}
 		if scanner.Text() == "@tr" {
-			viewHeadQuery(w, db, "select COLUMN_NAME AS clnme from information_schema.COLUMNS where TABLE_NAME='myarttable'")
-			viewSelectQuery(w, db, "SELECT * FROM myarttable WHERE id>14 ORDER BY id DESC")
+			viewHeadQuery(w, db, "select COLUMN_NAME AS clnme from information_schema.COLUMNS where TABLE_NAME='individuals'")
+			viewSelectQuery(w, db, "SELECT * FROM individuals WHERE id>14 ORDER BY id DESC")
 		}
 		if scanner.Text() == "@ver" {
 			viewSelectVerQuery(w, db, "SELECT VERSION() AS ver")
@@ -132,16 +132,16 @@ func viewHeadQuery(w http.ResponseWriter, db *sql.DB, sShow string) {
 
 // отправка в браузер строк из таблицы.
 func viewSelectQuery(w http.ResponseWriter, db *sql.DB, sSelect string) {
-	type test struct {
+	type bank struct {
 		id int
 		text string
 		description string
 		keywords string
 	}
-	tests := []test{}
-	//fmt.Println(reflect.TypeOf(tests))
+	banks := []bank{}
+	//fmt.Println(reflect.TypeOf(banks))
 
-	// получение значений в массив tests из струкрур типа test.
+	// получение значений в массив banks из струкрур типа bank.
     rows, err := db.Query(sSelect)
     if err != nil {
         panic(err)
@@ -149,17 +149,17 @@ func viewSelectQuery(w http.ResponseWriter, db *sql.DB, sSelect string) {
     defer rows.Close()
 
     for rows.Next(){
-        p := test{}
+        p := bank{}
         err := rows.Scan(&p.id, &p.text, &p.description, &p.keywords)
         if err != nil{
             fmt.Println(err)
             continue
         }
-        tests = append(tests, p)
+        banks = append(banks, p)
     }
 
 	// перебор массива из БД.
-	for _, p := range tests {
+	for _, p := range banks {
 		fmt.Fprintf(w, "<tr><td>"+strconv.Itoa(p.id)+"</td><td>"+p.text+"</td><td>"+p.description+"</td><td>"+p.keywords+"</td>")
 		fmt.Fprintf(w, "<td><a href=\"/edit?id="+strconv.Itoa(p.id)+"\">Edit</a></td></tr>")
 	}
@@ -188,14 +188,14 @@ func viewSelectVerQuery (w http.ResponseWriter, db *sql.DB, sSelect string) {
 
 // отображение формы редактирования
 func renderEditForm(w http.ResponseWriter, db *sql.DB, id string) {
-	type test struct {
+	type bank struct {
 		id int
 		text string
 		description string
 		keywords string
 	}
-	var p test
-	err := db.QueryRow("SELECT id, text, description, keywords FROM myarttable WHERE id = ?", id).Scan(&p.id, &p.text, &p.description, &p.keywords)
+	var p bank
+	err := db.QueryRow("SELECT id, text, description, keywords FROM individuals WHERE id = ?", id).Scan(&p.id, &p.text, &p.description, &p.keywords)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

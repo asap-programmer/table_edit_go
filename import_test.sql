@@ -1,6 +1,6 @@
 -- Creation of a test base...
 
-CREATE DATABASE IF NOT EXISTS test;
+CREATE DATABASE IF NOT EXISTS bank;
 
 CREATE TABLE files (
   id_file int(11) NOT NULL,
@@ -14,14 +14,14 @@ CREATE TABLE files (
 INSERT INTO files (id_file, id_my, description, name_origin, path, date_upload) VALUES
 (16, 17, 'Закачка из менеджера', 'test file 1.pdf', 'files/test_file1.pdf', '31-03-2023  20:07:59');
 
-CREATE TABLE myarttable (
+CREATE TABLE individuals (
   id int(11) NOT NULL,
   text text NOT NULL,
   description text NOT NULL,
   keywords text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=cp1251;
 
-INSERT INTO myarttable (id, text, description, keywords) VALUES
+INSERT INTO individuals (id, text, description, keywords) VALUES
 (17, 'Baranov', 'Engeneer', 'Ivanov'),
 (20, 'Fedorov', 'Cpp, Delphi, PHP, JS', '3t'),
 (92, 'Daniel', 'Artist', 'Theater Saturday'),
@@ -37,16 +37,16 @@ ALTER TABLE files
   ADD PRIMARY KEY (id_file),
   ADD KEY id_my (id_my);
 
-ALTER TABLE myarttable
+ALTER TABLE individuals
   ADD PRIMARY KEY (id);
 
 ALTER TABLE files
   MODIFY id_file int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
-ALTER TABLE myarttable
+ALTER TABLE individuals
   MODIFY id int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=100;
 
 ALTER TABLE files
-  ADD CONSTRAINT files_ibfk_1 FOREIGN KEY (id_my) REFERENCES myarttable (id);
+  ADD CONSTRAINT files_ibfk_1 FOREIGN KEY (id_my) REFERENCES individuals (id);
 COMMIT;
 
