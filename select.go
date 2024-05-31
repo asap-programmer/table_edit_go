@@ -33,7 +33,7 @@ func main() {
         val1 := r.FormValue("col1")
         val2 := r.FormValue("col2")
         val3 := r.FormValue("col3")
-		sQuery := "INSERT INTO individuals (text, description, keywords) VALUES ('"+val1+"', '"+val2+"', '"+val3+"')"
+		sQuery := "INSERT INTO individuals (first_name, second_name, passport) VALUES ('"+val1+"', '"+val2+"', '"+val3+"')"
 
 		fmt.Println(sQuery)
 
@@ -58,7 +58,7 @@ func main() {
 		val1 := r.FormValue("col1")
 		val2 := r.FormValue("col2")
 		val3 := r.FormValue("col3")
-		sQuery := "UPDATE individuals SET text = '" + val1 + "', description = '" + val2 + "', keywords = '" + val3 + "' WHERE id = " + id
+		sQuery := "UPDATE individuals SET first_name = '" + val1 + "', second_name = '" + val2 + "', passport = '" + val3 + "' WHERE id = " + id
 
 		fmt.Println(sQuery)
 
@@ -195,7 +195,7 @@ func renderEditForm(w http.ResponseWriter, db *sql.DB, id string) {
 		keywords string
 	}
 	var p bank
-	err := db.QueryRow("SELECT id, text, description, keywords FROM individuals WHERE id = ?", id).Scan(&p.id, &p.text, &p.description, &p.keywords)
+	err := db.QueryRow("SELECT id, first_name, second_name, passport keywords FROM individuals WHERE id = ?", id).Scan(&p.id, &p.text, &p.description, &p.keywords)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -204,9 +204,9 @@ func renderEditForm(w http.ResponseWriter, db *sql.DB, id string) {
 
 	fmt.Fprintf(w, `<form action="/update" method="post">`)
 	fmt.Fprintf(w, `<input type="hidden" name="id" value="%d">`, p.id)
-	fmt.Fprintf(w, `Text: <input type="text" name="col1" value="%s"><br>`, p.text)
-	fmt.Fprintf(w, `Description: <input type="text" name="col2" value="%s"><br>`, p.description)
-	fmt.Fprintf(w, `Keywords: <input type="text" name="col3" value="%s"><br>`, p.keywords)
+	fmt.Fprintf(w, `first_name: <input type="text" name="col1" value="%s"><br>`, p.text)
+	fmt.Fprintf(w, `second_name: <input type="text" name="col2" value="%s"><br>`, p.description)
+	fmt.Fprintf(w, `passport: <input type="text" name="col3" value="%s"><br>`, p.keywords)
 	fmt.Fprintf(w, `<input type="submit" value="Update">`)
 	fmt.Fprintf(w, `</form>`)
 	fmt.Fprintf(w, `<br><a style="background-color: #33bee1; color: #fff; padding: 2px 3px; text-decoration: none" href="/">Return to main menu</a>`)
