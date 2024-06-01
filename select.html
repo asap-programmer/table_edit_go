@@ -41,6 +41,7 @@ td {
     position: relative;
     border: 1px solid #333;
     height: 20px;
+	word-break: break-all;
 }
 td:first-child {
 	width: 35px;
@@ -70,9 +71,51 @@ input[type="submit"] {
     <body>
         <h1><a href=".">Таблица с редактированием в MySQL на GO (Golang)</a></h1>
         <form method="POST" action="postform">
-            <label>Имя: </label> <input type="text" name="col1" value="Иван" />
-            <label>Фамилия: </label> <input type="text" name="col2" value="Иванов" />
-            <label>Паспорт: </label> <input type="text" name="col3" value="3233 323233" />
+			<div style="display: flex; justify-content: center;">
+				<div style="text-align: left;">
+					<div>
+					<label style="margin-right: 10px;">Имя: </label> <input type="text" name="col1" value="Иван" />
+
+					</div>
+					<div>
+					<label style="margin-right: 10px;">Фамилия: </label> <input type="text" name="col2" value="Иванов" />
+
+					</div>
+					<div>
+						<label style="margin-right: 10px;">Отчество: </label> <input type="text" name="col3" value="Иванович" />
+
+					</div>
+					<div>
+					<label style="margin-right: 10px;">Паспорт: </label> <input type="text" name="col4" value="3233 323233" />
+
+					</div>
+					<div>
+						<label style="margin-right: 10px;">ИНН: </label> <input type="text" name="col5" value="418309800001" />
+
+					</div>
+				</div>
+				<div style="text-align: left; margin-left: 20px;">
+					<div>
+						<label style="margin-right: 10px;">СНИЛС: </label> <input type="text" name="col6" value="12345678901" />
+
+					</div>
+					<div>
+						<label style="margin-right: 10px;">Водительские права: </label> <input type="text" name="col7" value="1234 567890" />
+
+					</div>
+					<div>
+						<label style="margin-right: 10px;">Доп. документы: </label> <input type="text" name="col8" value="A1B2C3D4E5" />
+
+					</div>
+					<div>
+						<label style="margin-right: 10px;">Примечание: </label> <input type="text" name="col9" value="Document verified" />
+
+					</div>
+				</div>
+			</div>
+
+
+
             <input type="submit" value="Добавить" />
         </form>
 		<br />

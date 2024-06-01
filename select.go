@@ -33,7 +33,13 @@ func main() {
         val1 := r.FormValue("col1")
         val2 := r.FormValue("col2")
         val3 := r.FormValue("col3")
-		sQuery := "INSERT INTO individuals (first_name, second_name, passport) VALUES ('"+val1+"', '"+val2+"', '"+val3+"')"
+        val4 := r.FormValue("col4")
+        val5 := r.FormValue("col5")
+        val6 := r.FormValue("col6")
+        val7 := r.FormValue("col7")
+        val8 := r.FormValue("col8")
+        val9 := r.FormValue("col9")
+		sQuery := "INSERT INTO individuals (first_name, surname, patronymic, passport, inn, snils, driver_license, add_documents, notice) VALUES ('"+val1+"', '"+val2+"', '"+val3+"', '"+val4+"', '"+val5+"', '"+val6+"', '"+val7+"', '"+val8+"', '"+val9+"')"
 
 		fmt.Println(sQuery)
 
@@ -58,7 +64,13 @@ func main() {
 		val1 := r.FormValue("col1")
 		val2 := r.FormValue("col2")
 		val3 := r.FormValue("col3")
-		sQuery := "UPDATE individuals SET first_name = '" + val1 + "', second_name = '" + val2 + "', passport = '" + val3 + "' WHERE id = " + id
+		val4 := r.FormValue("col4")
+        val5 := r.FormValue("col5")
+        val6 := r.FormValue("col6")
+        val7 := r.FormValue("col7")
+        val8 := r.FormValue("col8")
+        val9 := r.FormValue("col9")
+		sQuery := "UPDATE individuals SET first_name = '" + val1 + "', surname = '" + val2 + "', patronymic = '" + val3 + "' , passport = '" + val4 + "', inn = '" + val5 + "', snils = '" + val6 + "', driver_license = '" + val7 + "', add_documents = '" + val8 + "', notice = '" + val9 + "' WHERE id = " + id
 
 		fmt.Println(sQuery)
 
@@ -90,7 +102,7 @@ func viewSelect(w http.ResponseWriter, db *sql.DB) {
 			fmt.Fprintf(w, scanner.Text())
 		}
 		if scanner.Text() == "@tr" {
-			viewHeadQuery(w, db, "select COLUMN_NAME AS clnme from information_schema.COLUMNS where TABLE_NAME='individuals'")
+			viewHeadQuery(w, db, "SELECT COLUMN_NAME FROM information_schema.COLUMNS WHERE TABLE_NAME = 'individuals' ORDER BY ORDINAL_POSITION")
 			viewSelectQuery(w, db, "SELECT * FROM individuals WHERE id>14 ORDER BY id DESC")
 		}
 		if scanner.Text() == "@ver" {
@@ -116,7 +128,7 @@ func viewHeadQuery(w http.ResponseWriter, db *sql.DB, sShow string) {
 
 	fmt.Fprintf(w, "<tr>")
 	i := 0
-     for i < 4 {
+     for i < 10 {
 		rows.Next()
         p := sHead{}
         err := rows.Scan(&p.clnme)
@@ -134,9 +146,15 @@ func viewHeadQuery(w http.ResponseWriter, db *sql.DB, sShow string) {
 func viewSelectQuery(w http.ResponseWriter, db *sql.DB, sSelect string) {
 	type bank struct {
 		id int
-		text string
-		description string
-		keywords string
+		first_name string
+		surname string
+		patronymic string
+		passport string
+		inn string
+		snils string
+		driver_license string
+		add_documents string
+		notice string
 	}
 	banks := []bank{}
 	//fmt.Println(reflect.TypeOf(banks))
@@ -150,7 +168,7 @@ func viewSelectQuery(w http.ResponseWriter, db *sql.DB, sSelect string) {
 
     for rows.Next(){
         p := bank{}
-        err := rows.Scan(&p.id, &p.text, &p.description, &p.keywords)
+        err := rows.Scan(&p.id, &p.first_name, &p.surname, &p.patronymic, &p.passport, &p.inn, &p.snils, &p.driver_license, &p.add_documents, &p.notice)
         if err != nil{
             fmt.Println(err)
             continue
@@ -160,7 +178,7 @@ func viewSelectQuery(w http.ResponseWriter, db *sql.DB, sSelect string) {
 
 	// перебор массива из БД.
 	for _, p := range banks {
-		fmt.Fprintf(w, "<tr><td>"+strconv.Itoa(p.id)+"</td><td>"+p.text+"</td><td>"+p.description+"</td><td>"+p.keywords+"</td>")
+		fmt.Fprintf(w, "<tr><td>"+strconv.Itoa(p.id)+"</td><td>"+p.first_name+"</td><td>"+p.patronymic+"</td><td>"+p.passport+"</td><td>"+p.inn+"</td><td>"+p.snils+"</td><td>"+p.driver_license+"</td><td>"+p.add_documents+"</td><td>"+p.notice+"</td>")
 		fmt.Fprintf(w, "<td><a href=\"/edit?id="+strconv.Itoa(p.id)+"\">Edit</a></td></tr>")
 	}
 }
@@ -190,12 +208,18 @@ func viewSelectVerQuery (w http.ResponseWriter, db *sql.DB, sSelect string) {
 func renderEditForm(w http.ResponseWriter, db *sql.DB, id string) {
 	type bank struct {
 		id int
-		text string
-		description string
-		keywords string
+		first_name string
+		surname string
+		patronymic string
+		passport string
+		inn string
+		snils string
+		driver_license string
+		add_documents string
+		notice string
 	}
 	var p bank
-	err := db.QueryRow("SELECT id, first_name, second_name, passport keywords FROM individuals WHERE id = ?", id).Scan(&p.id, &p.text, &p.description, &p.keywords)
+	err := db.QueryRow("SELECT id, first_name, surname, patronymic, passport, inn, snils, driver_license, add_documents, notice FROM individuals WHERE id = ?", id).Scan(&p.id, &p.first_name, &p.surname, &p.patronymic, &p.passport, &p.inn, &p.snils, &p.driver_license, &p.add_documents, &p.notice)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -204,9 +228,15 @@ func renderEditForm(w http.ResponseWriter, db *sql.DB, id string) {
 
 	fmt.Fprintf(w, `<form action="/update" method="post">`)
 	fmt.Fprintf(w, `<input type="hidden" name="id" value="%d">`, p.id)
-	fmt.Fprintf(w, `first_name: <input type="text" name="col1" value="%s"><br>`, p.text)
-	fmt.Fprintf(w, `second_name: <input type="text" name="col2" value="%s"><br>`, p.description)
-	fmt.Fprintf(w, `passport: <input type="text" name="col3" value="%s"><br>`, p.keywords)
+	fmt.Fprintf(w, `first_name: <input type="text" name="col1" value="%s"><br>`, p.first_name)
+	fmt.Fprintf(w, `surname: <input type="text" name="col2" value="%s"><br>`, p.surname)
+	fmt.Fprintf(w, `patronymic: <input type="text" name="col3" value="%s"><br>`, p.patronymic)
+	fmt.Fprintf(w, `passport: <input type="text" name="col4" value="%s"><br>`, p.passport)
+	fmt.Fprintf(w, `inn: <input type="text" name="col5" value="%s"><br>`, p.inn)
+	fmt.Fprintf(w, `snils: <input type="text" name="col6" value="%s"><br>`, p.snils)
+	fmt.Fprintf(w, `driver_license: <input type="text" name="col7" value="%s"><br>`, p.driver_license)
+	fmt.Fprintf(w, `add_documents: <input type="text" name="col8" value="%s"><br>`, p.add_documents)
+	fmt.Fprintf(w, `notice: <input type="text" name="col9" value="%s"><br>`, p.notice)
 	fmt.Fprintf(w, `<input type="submit" value="Update">`)
 	fmt.Fprintf(w, `</form>`)
 	fmt.Fprintf(w, `<br><a style="background-color: #33bee1; color: #fff; padding: 2px 3px; text-decoration: none" href="/">Return to main menu</a>`)
